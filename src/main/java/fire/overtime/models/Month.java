@@ -4,51 +4,48 @@ import javax.persistence.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "month")
+@Table(name = "month_year")
 public class Month {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "Id")
-    private Integer Id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "month_type")
-    private String month_type;
+    private String monthType;
 
     @Column(name = "norma_hours")
-    private Integer norma_hours;
+    private Integer normaHours;
 
     @Column(name = "year")
     private Integer year;
 
-    @ManyToMany(mappedBy = "months")
-    private Set<Firefighter> firefighters;
-
-    public Month() {
-    }
+//    @ManyToMany(mappedBy = "month_year")
+    @OneToMany(mappedBy = "month_year")
+    private Set<Hours> hours;
 
     public Integer getMonthYearId() {
-        return Id;
+        return id;
     }
 
-    public void setMonthYearId(Integer Id) {
-        this.Id = Id;
+    public void setMonthYearId(Integer id) {
+        this.id = id;
     }
 
-    public String getMonth_type() {
-        return month_type;
+    public String getMonthType() {
+        return monthType;
     }
 
-    public void setMonth_type(String month_type) {
-        this.month_type = month_type;
+    public void setMonthType(String monthType) {
+        this.monthType = monthType;
     }
 
-    public Integer getNorma_hours() {
-        return norma_hours;
+    public Integer getNormaHours() {
+        return normaHours;
     }
 
-    public void setNorma_hours(Integer norma_hours) {
-        this.norma_hours = norma_hours;
+    public void setNormaHours(Integer normaHours) {
+        this.normaHours = normaHours;
     }
 
     public Integer getYear() {
