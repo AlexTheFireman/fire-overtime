@@ -1,6 +1,7 @@
 package fire.overtime.models;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -20,9 +21,8 @@ public class Month {
     @Column(name = "year")
     private Integer year;
 
-//    @ManyToMany(mappedBy = "month_year")
-    @OneToMany(mappedBy = "month_year")
-    private Set<Hours> hours;
+    @OneToMany(mappedBy = "month")
+    private Set<Hours> hours = new HashSet<>();
 
     public Integer getMonthYearId() {
         return id;

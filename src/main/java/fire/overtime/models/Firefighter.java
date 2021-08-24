@@ -25,11 +25,6 @@ public class Firefighter {
     @Column(name = "position")
     private String position;
 
-//    @ManyToMany
-//    @JoinTable(name = "hours",
-//            joinColumns = @JoinColumn(name = "firefighterId"),
-//            inverseJoinColumns = @JoinColumn(name = "monthYearId")
-//    )
     @OneToMany(mappedBy = "firefighter")
     private Set<Hours> hours = new HashSet<>();
 

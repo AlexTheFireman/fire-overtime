@@ -2,8 +2,6 @@ package fire.overtime.models;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "hours")
@@ -11,15 +9,15 @@ public class Hours {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer hours_id;
+    private Integer hoursId;
 
     @ManyToOne
     @JoinColumn(name = "firefighter_id")
-    Firefighter firefighter;
+    private Firefighter firefighter;
 
     @ManyToOne
     @JoinColumn(name = "month_year_id")
-    Month month;
+    private Month month;
 
     @Column(name = "date")
     private LocalDate date;
@@ -30,12 +28,12 @@ public class Hours {
     @Column(name = "hours_type")
     private String hoursType;
 
-    public Integer getHours_id() {
-        return hours_id;
+    public Integer getHoursId() {
+        return hoursId;
     }
 
-    public void setHours_id(Integer hours_id) {
-        this.hours_id = hours_id;
+    public void setHoursId(Integer hoursId) {
+        this.hoursId = hoursId;
     }
 
     public LocalDate getDate() {
