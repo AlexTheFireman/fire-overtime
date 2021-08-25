@@ -20,8 +20,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = OvertimeApplication.class)
@@ -37,89 +36,47 @@ public class HoursRepositoryTest {
     @Autowired
     HoursService hoursService;
 
-//    @Before
-//    public void setFireFighter() {
-//        Firefighter firefighter = new Firefighter();
-//        firefighter.setFirstName("test-name");
-//        firefighter.setLastName("test-lastname");
-//        firefighter.setPatronymic("test-patronimic");
-//        firefighter.setPosition("test-position");
-//        firefighterRepository.save(firefighter);
-//    }
-
-//    @Before
-//    public void setMonth() {
-//        Month month = new Month();
-//        month.setMonthType("June");
-//        month.setNormaHours(160);
-//        month.setYear(2020);
-//        monthRepository.save(month);
-//    }
-
-//    @Before
-//    public void setHours() {
-//        LocalDate date = LocalDate.of(2021, 8, 21);
-//        Hours hours = hoursService.setHoursWithType(date, firefighterRepository.getById(1), monthRepository.getById(1), 24,
-//                "WORK");
-//        hoursRepository.save(hours);
-//    }
+    static final LocalDate DATE = LocalDate.of(2021, 8, 21);
 
     @Test
     public void addHoursWithDateForFirefighter() {
-        //Given
-        Firefighter firefighter = new Firefighter();
-        firefighter.setFirstName("test-name");
-        firefighter.setLastName("test-lastname");
-        firefighter.setPatronymic("test-patronimic");
-        firefighter.setPosition("test-position");
-        Firefighter savedFirefighter = firefighterRepository.save(firefighter);
+        Firefighter firefighter = givenSavedFirefighter();
+        Month month = givenSavedMonth();
 
-        Month month = new Month();
-        month.setMonthType("June");
-        month.setNormaHours(160);
-        month.setYear(2020);
-        Month savedMonth = monthRepository.save(month);
-
-        LocalDate date = LocalDate.of(2021, 8, 21);
-        Hours hours = hoursService.setHoursWithType(date, savedFirefighter, savedMonth, 24,
-                "WORK");
-        hoursRepository.save(hours);
         //When
-
+        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
+                "WORK");
 
         //Then
-        assertNotNull(firefighterRepository.findById(1));
-        assertNotNull(monthRepository.findById(1));
-        assertNotNull(hoursRepository.findById(1));
-//
+        assertEquals(24, hoursRepository.getById(1).getFactHours());
     }
-
 
     @Test
     public void getHoursByFirefighterIdAndType() {
+        Firefighter firefighter = givenSavedFirefighter();
+        Month month = givenSavedMonth();
+
+        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
+                "WORK");
+
+        assertNotNull(hoursRepository.getHoursByFirefighterAndHoursType(firefighter, "WORK"));
+    }
+
+    public Firefighter givenSavedFirefighter() {
         Firefighter firefighter = new Firefighter();
         firefighter.setFirstName("test-name");
         firefighter.setLastName("test-lastname");
         firefighter.setPatronymic("test-patronimic");
         firefighter.setPosition("test-position");
-        Firefighter savedFirefighter = firefighterRepository.save(firefighter);
+        return firefighterRepository.save(firefighter);
+    }
 
+    public Month givenSavedMonth() {
         Month month = new Month();
         month.setMonthType("June");
         month.setNormaHours(160);
         month.setYear(2020);
-        Month savedMonth = monthRepository.save(month);
-
-        LocalDate date = LocalDate.of(2021, 8, 21);
-        Hours hours = hoursService.setHoursWithType(date, savedFirefighter, savedMonth, 24,
-                "WORK");
-        hoursRepository.save(hours);
-
-        assertNotNull(hoursRepository.getHoursByFirefighterAndHoursType(firefighter, "WORK"));
-//        System.out.println(firefighterRepository.getById(1));
-//        List<Hours> listHours = hoursRepository.getHoursByFirefighterAndHoursType(
-//                firefighter, "WORK");
-//        System.out.println(listHours);
+        return monthRepository.save(month);
     }
 }
 

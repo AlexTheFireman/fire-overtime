@@ -37,7 +37,7 @@ public class HoursService {
         hours.setMonth(month);
     }
 
-    public Hours setHoursWithType(LocalDate date, Firefighter firefighter,
+    public void setHoursWithFirefighterAndMonthAndType(LocalDate date, Firefighter firefighter,
                                 Month month, int factHours, String hoursType) {
         Hours hours = new Hours();
         hours.setDate(date);
@@ -45,7 +45,7 @@ public class HoursService {
         hours.setHoursType(hoursType);
         hours.setFirefighter(firefighter);
         hours.setMonth(month);
-        return hours;
+        hoursRepository.save(hours);
     }
 
 //    List<Hours> getFactHoursByFirefighterIdAndMonthIdAndHoursType(Integer firefighterId, Integer monthYearId){
