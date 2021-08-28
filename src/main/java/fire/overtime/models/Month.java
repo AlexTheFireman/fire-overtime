@@ -12,14 +12,14 @@ public class Month {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "month_type")
-    private String monthType;
+    @Column(name = "month_name")
+    private String monthName;
 
     @Column(name = "norma_hours")
-    private Integer normaHours;
+    private int normaHours;
 
     @Column(name = "year")
-    private Integer year;
+    private int year;
 
     @OneToMany(mappedBy = "month")
     private Set<Hours> hours = new HashSet<>();
@@ -32,12 +32,12 @@ public class Month {
         this.id = id;
     }
 
-    public String getMonthType() {
-        return monthType;
+    public String getMonthName() {
+        return monthName;
     }
 
-    public void setMonthType(String monthType) {
-        this.monthType = monthType;
+    public void setMonthName(String monthName) {
+        this.monthName = monthName;
     }
 
     public Integer getNormaHours() {

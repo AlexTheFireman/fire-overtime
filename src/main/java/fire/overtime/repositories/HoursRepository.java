@@ -17,14 +17,13 @@ public interface HoursRepository extends JpaRepository<Hours, Integer> {
     @Query("select h from Hours h where h.firefighter.id=:firefighterId and h.month.id= :monthYearId")
     List<Hours> getHours(@Param("firefighterId") Integer firefighterId, @Param("monthYearId") Integer monthYearId);
 
-    List<Hours> getHoursByFirefighterAndMonthAndHoursType(Firefighter firefighter,
-                                                             Month month, String hoursType);
-    void deleteByFirefighterId(Integer firefighterId);
+    List<Hours> getHoursByFirefighterIdAndMonthIdAndHoursType(Integer firefighterId,
+                                                             Integer monthYearId, String hoursType);
 
-    Hours getByHoursId(int hoursId);
+    List<Hours> getHoursByFirefighterIdAndMonth_YearAndHoursType(
+            Integer firefighterId, int year, String hoursType);
 
-    List<Hours> getHoursByFirefighterAndHoursType(Firefighter firefighter, String hoursType);
+    void deleteByFirefighterIdAndDate(Integer firefighterId, LocalDate date);
 
-    Hours getByHoursTypeAndDate(String hoursType, LocalDate date);
-
+    Hours getHoursByDate(LocalDate date);
 }

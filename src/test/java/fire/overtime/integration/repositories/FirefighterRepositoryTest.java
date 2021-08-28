@@ -54,7 +54,7 @@ public class FirefighterRepositoryTest {
     public void addFighterWithMonth_success() {
         //Given
         Month month = new Month();
-        month.setMonthType("June");
+        month.setMonthName("June");
         month.setNormaHours(12);
         month.setNormaHours(8);
         month.setMonthYearId(2020);

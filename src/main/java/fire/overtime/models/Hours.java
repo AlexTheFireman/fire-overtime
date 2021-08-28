@@ -23,7 +23,7 @@ public class Hours {
     private LocalDate date;
 
     @Column(name = "fact_hours")
-    private int factHours;
+    private Integer factHours;
 
     @Column(name = "hours_type")
     private String hoursType;

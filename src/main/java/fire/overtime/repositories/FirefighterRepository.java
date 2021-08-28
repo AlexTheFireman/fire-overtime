@@ -9,7 +9,5 @@ import java.time.LocalDate;
 @Repository
 public interface FirefighterRepository extends JpaRepository<Firefighter, Integer> {
     Firefighter findByFirstName(String name);
-
-
 }
 
