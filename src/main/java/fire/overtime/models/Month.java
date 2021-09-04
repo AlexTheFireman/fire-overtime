@@ -21,8 +21,15 @@ public class Month {
     @Column(name = "year")
     private int year;
 
-    @OneToMany(mappedBy = "month")
+    @OneToMany(mappedBy = "month", cascade = CascadeType.ALL)
     private Set<Hours> hours = new HashSet<>();
+
+    public Month(Integer monthId) {
+    }
+
+    public Month() {
+
+    }
 
     public Integer getMonthYearId() {
         return id;

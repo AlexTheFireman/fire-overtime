@@ -1,6 +1,7 @@
 package fire.overtime.integration.repositories;
 
 import fire.overtime.OvertimeApplication;
+import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.models.Firefighter;
 import fire.overtime.models.Hours;
 import fire.overtime.models.Month;
@@ -43,8 +44,8 @@ public class HoursRepositoryTest {
     public void AddHoursWithDateForFirefighterTest() {
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
-        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
-                "WORK");
+        HoursSaveCommand hoursSaveCommand = givenHoursSaveCommand(firefighter, month, 24, "WORK");
+        hoursService.saveHours(hoursSaveCommand);
         assertEquals(24, hoursRepository.getById(1).getFactHours());
     }
 
@@ -52,8 +53,8 @@ public class HoursRepositoryTest {
     public void GetHoursByFirefighterIdAndMonthIdAndHoursTypeTest() {
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
-        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
-                "WORK");
+        HoursSaveCommand hoursSaveCommand = givenHoursSaveCommand(firefighter, month, 24, "WORK");
+        hoursService.saveHours(hoursSaveCommand);
         assertNotNull(hoursRepository.getHoursByFirefighterIdAndMonthIdAndHoursType(
                 firefighter.getFirefighterId(), month.getMonthYearId(), "WORK"));
     }
@@ -62,8 +63,8 @@ public class HoursRepositoryTest {
     public void GetHoursByFirefighterIdAndMonth_YearAndHoursTypeTest() {
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
-        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
-                "WORK");
+        HoursSaveCommand hoursSaveCommand = givenHoursSaveCommand(firefighter, month, 24, "WORK");
+        hoursService.saveHours(hoursSaveCommand);
         assertNotNull(hoursRepository.getHoursByFirefighterIdAndMonthIdAndHoursType(
                 firefighter.getFirefighterId(), 2021,"WORK"));
     }
@@ -72,10 +73,10 @@ public class HoursRepositoryTest {
     public void DeleteByFirefighterIdAAndDateTest() {
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
-        hoursService.setHoursWithFirefighterAndMonthAndType(DATE, firefighter, month, 24,
-                "WORK");
+        HoursSaveCommand hoursSaveCommand = givenHoursSaveCommand(firefighter, month, 24, "WORK");
+        hoursService.saveHours(hoursSaveCommand);
         hoursRepository.deleteByFirefighterIdAndDate(firefighter.getFirefighterId(), DATE);
-        assertNull(hoursRepository.getHoursByDate(DATE));
+        assertNull(hoursRepository.getHoursByDateAndFirefighter(DATE, firefighter));
     }
 
 
@@ -94,6 +95,17 @@ public class HoursRepositoryTest {
         month.setNormaHours(160);
         month.setYear(2021);
         return monthRepository.save(month);
+    }
+
+    public HoursSaveCommand givenHoursSaveCommand(
+            Firefighter firefighter, Month month, int factHours, String hoursType){
+        HoursSaveCommand hoursSaveCommand = new HoursSaveCommand();
+        hoursSaveCommand.setFirefighterId(firefighter.getFirefighterId());
+        hoursSaveCommand.setMonthId(month.getMonthYearId());
+        hoursSaveCommand.setFactHours(factHours);
+        hoursSaveCommand.setHoursType(hoursType);
+        hoursSaveCommand.setDate(DATE);
+        return hoursSaveCommand;
     }
 }
 

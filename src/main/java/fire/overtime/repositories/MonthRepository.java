@@ -9,9 +9,7 @@ import java.util.List;
 
 @Repository
 public interface MonthRepository extends JpaRepository<Month, Integer> {
-    Firefighter findByYear(Integer year);
 
     List<Month> getMonthsByYear(int year);
-
 
 }

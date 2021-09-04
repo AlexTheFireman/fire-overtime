@@ -1,5 +1,7 @@
 package fire.overtime.services;
 
+import fire.overtime.commands.HoursSaveCommand;
+import fire.overtime.commands.HoursUpdateCommand;
 import fire.overtime.models.Firefighter;
 import fire.overtime.models.Hours;
 import fire.overtime.models.Month;
@@ -30,31 +32,47 @@ public class HoursService {
         this.hoursRepository = hoursRepository;
     }
 
-    public void updateHoursById(int hourIdForUpdate, LocalDate date, Firefighter firefighter,
-                                Month month, Integer factHours, String hoursType) {
-        Optional<Hours> byId = hoursRepository.findById(hourIdForUpdate);
+    public Hours updateHours(HoursUpdateCommand hoursUpdateCommand) {
+        Optional<Hours> byId = hoursRepository.findById(hoursUpdateCommand.getHourIdForUpdate());
         if (!byId.isPresent())
-            throw new RuntimeException(String.format("Hours with id %d should be present", hourIdForUpdate));
+            throw new RuntimeException(String.format("Hours with id %d should be present", hoursUpdateCommand.getHourIdForUpdate()));
+
         Hours hours = byId.get();
-        hours.setDate(date);
-        hours.setFactHours(factHours);
-        hours.setHoursType(hoursType);
-        hours.setFirefighter(firefighter);
-        hours.setMonth(month);
+        if (hoursUpdateCommand.getDate() != null) {
+            hours.setDate(hoursUpdateCommand.getDate());
+        }
+
+        if (hoursUpdateCommand.getFactHours() > 0) {
+            hours.setFactHours(hoursUpdateCommand.getFactHours());
+        }
+
+        if (hoursUpdateCommand.getHoursType() != null) {
+            hours.setHoursType(hoursUpdateCommand.getHoursType());
+        }
+
+        if (hoursUpdateCommand.getFirefighterId() != null) {
+            hours.setFirefighter(new Firefighter(hoursUpdateCommand.getFirefighterId()));
+        }
+
+        if (hoursUpdateCommand.getMonthId() != null) {
+            hours.setMonth(new Month(hoursUpdateCommand.getMonthId()));
+        }
+
+        return hoursRepository.save(hours);
     }
 
-    public void setHoursWithFirefighterAndMonthAndType(LocalDate date, Firefighter firefighter,
-                                Month month, Integer factHours, String hoursType) {
+    public Hours saveHours(HoursSaveCommand hoursSaveCommand) {
         Hours hours = new Hours();
-        hours.setDate(date);
-        hours.setFactHours(factHours);
-        hours.setHoursType(hoursType);
-        hours.setFirefighter(firefighter);
-        hours.setMonth(month);
-        hoursRepository.save(hours);
+        hours.setDate(hoursSaveCommand.getDate());
+        hours.setFactHours(hoursSaveCommand.getFactHours());
+        hours.setHoursType(hoursSaveCommand.getHoursType());
+        hours.setFirefighter(new Firefighter(hoursSaveCommand.getFirefighterId()));
+        hours.setMonth(new Month(hoursSaveCommand.getMonthId()));
+
+        return hoursRepository.save(hours);
     }
 
-    int getHoursPerPeriodByType(int firefighterId, int periodId, String hoursType) {
+    public int getHoursPerPeriodByType(int firefighterId, int periodId, String hoursType) {
         List<Hours> hoursPerPeriodList;
         if (periodId < 2000) {
             hoursPerPeriodList = hoursRepository.getHoursByFirefighterIdAndMonthIdAndHoursType(
@@ -81,6 +99,10 @@ public class HoursService {
         int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, "VACATION");
         int normWorkingHoursPerYear = monthService.getLawNormWorkingHoursByYear(year);
         return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
+    }
+
+    public void deleteHours(Integer firefighterId, LocalDate date) {
+        hoursRepository.deleteByFirefighterIdAndDate(firefighterId, date);
     }
 }
 

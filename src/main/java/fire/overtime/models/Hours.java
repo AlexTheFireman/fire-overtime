@@ -11,11 +11,11 @@ public class Hours {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer hoursId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "firefighter_id")
     private Firefighter firefighter;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "month_year_id")
     private Month month;
 

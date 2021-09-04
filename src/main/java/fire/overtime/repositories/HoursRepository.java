@@ -25,5 +25,5 @@ public interface HoursRepository extends JpaRepository<Hours, Integer> {
 
     void deleteByFirefighterIdAndDate(Integer firefighterId, LocalDate date);
 
-    Hours getHoursByDate(LocalDate date);
+    Hours getHoursByDateAndFirefighter(LocalDate date, Firefighter firefighter);
 }

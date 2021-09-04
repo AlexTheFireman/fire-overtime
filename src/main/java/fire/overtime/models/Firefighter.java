@@ -25,8 +25,15 @@ public class Firefighter {
     @Column(name = "position")
     private String position;
 
-    @OneToMany(mappedBy = "firefighter")
+    @OneToMany(mappedBy = "firefighter", cascade = CascadeType.ALL)
     private Set<Hours> hours = new HashSet<>();
+
+    public Firefighter(Integer firefighterId) {
+    }
+
+    public Firefighter() {
+
+    }
 
     public Integer getFirefighterId() {
         return id;
