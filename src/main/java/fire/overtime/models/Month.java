@@ -31,11 +31,11 @@ public class Month {
 
     }
 
-    public Integer getMonthYearId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setMonthYearId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

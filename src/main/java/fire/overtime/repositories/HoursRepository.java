@@ -1,8 +1,8 @@
 package fire.overtime.repositories;
 
+import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Firefighter;
 import fire.overtime.models.Hours;
-import fire.overtime.models.Month;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,10 +18,10 @@ public interface HoursRepository extends JpaRepository<Hours, Integer> {
     List<Hours> getHours(@Param("firefighterId") Integer firefighterId, @Param("monthYearId") Integer monthYearId);
 
     List<Hours> getHoursByFirefighterIdAndMonthIdAndHoursType(Integer firefighterId,
-                                                             Integer monthYearId, String hoursType);
+                                                             Integer monthYearId, HourType hoursType);
 
     List<Hours> getHoursByFirefighterIdAndMonth_YearAndHoursType(
-            Integer firefighterId, int year, String hoursType);
+            Integer firefighterId, int year, HourType hoursType);
 
     void deleteByFirefighterIdAndDate(Integer firefighterId, LocalDate date);
 

@@ -48,7 +48,7 @@ class CommonRepositoryTest {
         Firefighter savedFighter = firefighterRepository.save(firefighter);
 
         //Then
-        assertNotNull(firefighterRepository.findById(savedFighter.getFirefighterId()));
+        assertNotNull(firefighterRepository.findById(savedFighter.getId()));
     }
 
     @Test
@@ -58,7 +58,7 @@ class CommonRepositoryTest {
         month.setMonthName("June");
         month.setNormaHours(12);
         month.setNormaHours(8);
-        month.setMonthYearId(2020);
+        month.setId(2020);
         Month savedMonth = monthRepository.save(month);
         Set<Month> months = new HashSet<>();
         months.add(savedMonth);
@@ -80,7 +80,7 @@ class CommonRepositoryTest {
         hoursRepository.save(hours);
 
         //Then
-        Optional<Firefighter> fetchedFighter = firefighterRepository.findById(savedFighter.getFirefighterId());
+        Optional<Firefighter> fetchedFighter = firefighterRepository.findById(savedFighter.getId());
         assertTrue(fetchedFighter.isPresent());
         assertNotNull(fetchedFighter.get());
         assertNotNull(fetchedFighter.get().getHours());

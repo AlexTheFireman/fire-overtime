@@ -35,11 +35,11 @@ public class Firefighter {
 
     }
 
-    public Integer getFirefighterId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setFirefighterId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

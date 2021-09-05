@@ -2,6 +2,7 @@ package fire.overtime.services;
 
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
+import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Firefighter;
 import fire.overtime.models.Hours;
 import fire.overtime.models.Month;
@@ -15,6 +16,9 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
+import static fire.overtime.models.Enums.HourType.VACATION;
+import static fire.overtime.models.Enums.HourType.WORK;
 
 @Service
 @Transactional
@@ -72,7 +76,7 @@ public class HoursService {
         return hoursRepository.save(hours);
     }
 
-    public int getHoursPerPeriodByType(int firefighterId, int periodId, String hoursType) {
+    public int getHoursPerPeriodByType(int firefighterId, int periodId, HourType hoursType) {
         List<Hours> hoursPerPeriodList;
         if (periodId < 2000) {
             hoursPerPeriodList = hoursRepository.getHoursByFirefighterIdAndMonthIdAndHoursType(
@@ -87,16 +91,15 @@ public class HoursService {
 
     public int getOvertimePerMonth(int firefighterId, int monthYearId) {
         int workingHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId,
-                "WORK");
-        int vacationHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId, "VACATION");
+                WORK);
+        int vacationHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId, VACATION);
         Integer normWorkingHoursPerMonth = monthRepository.getById(monthYearId).getNormaHours();
         return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
     }
 
     public int getOvertimePerYear(int firefighterId, Integer year) {
-        int workingHoursPerYear = getHoursPerPeriodByType(firefighterId, year,
-                "WORK");
-        int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, "VACATION");
+        int workingHoursPerYear = getHoursPerPeriodByType(firefighterId, year, WORK);
+        int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, VACATION);
         int normWorkingHoursPerYear = monthService.getLawNormWorkingHoursByYear(year);
         return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
     }

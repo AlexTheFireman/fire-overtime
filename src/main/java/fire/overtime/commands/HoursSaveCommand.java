@@ -1,5 +1,7 @@
 package fire.overtime.commands;
 
+import fire.overtime.models.Enums.HourType;
+
 import java.time.LocalDate;
 
 public class HoursSaveCommand {
@@ -7,7 +9,7 @@ public class HoursSaveCommand {
     private LocalDate date;
     private Integer monthId;
     private int factHours;
-    private String hoursType;
+    private HourType hoursType;
 
     public HoursSaveCommand() {
     }
@@ -45,11 +47,11 @@ public class HoursSaveCommand {
         this.factHours = factHours;
     }
 
-    public String getHoursType() {
+    public HourType getHoursType() {
         return hoursType;
     }
 
-    public void setHoursType(String hoursType) {
+    public void setHoursType(HourType hoursType) {
         this.hoursType = hoursType;
     }
 }

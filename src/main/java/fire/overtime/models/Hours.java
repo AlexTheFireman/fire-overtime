@@ -1,5 +1,7 @@
 package fire.overtime.models;
 
+import fire.overtime.models.Enums.HourType;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -26,13 +28,14 @@ public class Hours {
     private Integer factHours;
 
     @Column(name = "hours_type")
-    private String hoursType;
+    @Enumerated(EnumType.STRING)
+    private HourType hoursType;
 
-    public Integer getHoursId() {
+    public Integer getId() {
         return hoursId;
     }
 
-    public void setHoursId(Integer hoursId) {
+    public void setId(Integer hoursId) {
         this.hoursId = hoursId;
     }
 
@@ -52,11 +55,11 @@ public class Hours {
         this.factHours = factHours;
     }
 
-    public String getHoursType() {
+    public HourType getHoursType() {
         return hoursType;
     }
 
-    public void setHoursType(String hoursType) {
+    public void setHoursType(HourType hoursType) {
         this.hoursType = hoursType;
     }
 
