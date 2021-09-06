@@ -14,7 +14,6 @@ public class HoursSaveCommand {
     public HoursSaveCommand() {
     }
 
-
     public Integer getFirefighterId() {
         return firefighterId;
     }

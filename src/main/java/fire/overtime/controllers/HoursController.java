@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/hours")
 public class HoursController {
@@ -34,6 +36,24 @@ public class HoursController {
     @ResponseStatus(HttpStatus.OK)
     public int getHoursPerPeriodByType(@PathVariable Integer firefighterId, @PathVariable Integer periodId, HourType hoursType) {
         return hoursService.getHoursPerPeriodByType(firefighterId, periodId, hoursType);
+    }
+
+    @GetMapping(value = "/firefighter/{firefighterId}/overtime/month/{periodId}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getMonthOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) {
+        return hoursService.getOvertimePerMonth(firefighterId, periodId);
+    }
+
+    @GetMapping(value = "/firefighter/{firefighterId}/overtime/year/{periodId}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getYearOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) {
+        return hoursService.getOvertimePerYear(firefighterId, periodId);
+    }
+
+    @DeleteMapping(value = "/delete/{firefighterId}/{date}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteHours(@PathVariable Integer firefighterId, LocalDate date) {
+        hoursService.deleteHours(firefighterId, date);
     }
 }
 

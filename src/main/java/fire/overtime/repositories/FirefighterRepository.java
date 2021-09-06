@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FirefighterRepository extends JpaRepository<Firefighter, Integer> {
-
+    void  deleteById(Integer id);
 }
 

@@ -17,6 +17,9 @@ public class Hours {
     @JoinColumn(name = "firefighter_id")
     private Firefighter firefighter;
 
+    @Column(name = "firefighter_id", insertable = false, updatable = false)
+    private Integer firefighterId;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "month_year_id")
     private Month month;
@@ -77,6 +80,14 @@ public class Hours {
 
     public void setMonth(Month month) {
         this.month = month;
+    }
+
+    public Integer getFirefighterId() {
+        return firefighterId;
+    }
+
+    public void setFirefighterId(Integer firefighterId) {
+        this.firefighterId = firefighterId;
     }
 }
 
