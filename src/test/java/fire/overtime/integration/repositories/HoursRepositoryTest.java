@@ -74,18 +74,19 @@ public class HoursRepositoryTest {
     }
 
     @Test
-    public void DeleteByFirefighterIdAAndDateTest() {
+    public void deleteByFirefighterIdAndDateTest() {
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
         HoursSaveCommand hoursSaveCommand = givenHoursSaveCommand(
                 firefighter, month, 24, WORK);
         hoursService.saveHours(hoursSaveCommand);
         hoursRepository.deleteByFirefighterIdAndDate(firefighter.getId(), DATE);
-        assertNull(hoursRepository.getHoursByDateAndFirefighter(DATE, firefighter));
+        assertNull(hoursRepository.getHoursByDateAndFirefighterId(DATE, firefighter.getId()));
     }
 
 
-    public Firefighter givenSavedFirefighter() {
+
+    private Firefighter givenSavedFirefighter() {
         Firefighter firefighter = new Firefighter();
         firefighter.setFirstName("test-name");
         firefighter.setLastName("test-lastname");
@@ -94,7 +95,7 @@ public class HoursRepositoryTest {
         return firefighterRepository.save(firefighter);
     }
 
-    public Month givenSavedMonth() {
+    private Month givenSavedMonth() {
         Month month = new Month();
         month.setMonthName("June");
         month.setNormaHours(160);
@@ -102,7 +103,7 @@ public class HoursRepositoryTest {
         return monthRepository.save(month);
     }
 
-    public HoursSaveCommand givenHoursSaveCommand(
+    private HoursSaveCommand givenHoursSaveCommand(
             Firefighter firefighter, Month month, int factHours, HourType hoursType){
         HoursSaveCommand hoursSaveCommand = new HoursSaveCommand();
         hoursSaveCommand.setFirefighterId(firefighter.getId());
@@ -113,4 +114,5 @@ public class HoursRepositoryTest {
         return hoursSaveCommand;
     }
 }
+
 

@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -32,8 +33,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 
 import static fire.overtime.models.Enums.HourType.WORK;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,8 +70,9 @@ public class HoursControllerTest {
 
         Firefighter firefighter = givenSavedFirefighter();
         Month month = givenSavedMonth();
-//        givenSavedHours(month, firefighter);
+
         this.testHoursSavedCommand = givenHoursSaveCommand(firefighter, month, 12, HourType.WORK);
+        givenSavedHours(month, firefighter);
     }
 
     @Test
@@ -86,6 +87,21 @@ public class HoursControllerTest {
         assertEquals(testHoursSavedCommand.getDate(), hours.getDate());
         assertEquals(testHoursSavedCommand.getFactHours(), hours.getFactHours());
         assertEquals(testHoursSavedCommand.getFirefighterId(), hours.getFirefighterId());
+    }
+
+    @Test
+    public void deleteHours_success() throws Exception {
+//        MockHttpServletRequestBuilder updateTargetBuilder = MockMvcRequestBuilders.delete(
+//                "/hours/firefighter/{firefighterId}/{date}",
+//                testHoursSavedCommand.getFirefighterId(),
+//                testHoursSavedCommand.getDate());
+//        MvcResult mvcResult = this.mockMvc.perform(updateTargetBuilder).andDo(print()).andExpect(status().isOk()).andReturn();
+//        Hours hours = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Hours.class);
+        MockHttpServletRequestBuilder updateTargetBuilder = MockMvcRequestBuilders.delete(
+                "/hours/firefighter/{firefighterId}/{date}", 1, DATE);
+        this.mockMvc.perform(updateTargetBuilder).andExpect(status().isOk()).andReturn();
+        assertNull(hoursRepository.getHoursByDateAndFirefighterId(
+                testHoursSavedCommand.getDate(),testHoursSavedCommand.getFirefighterId()));
     }
 
     private Firefighter givenSavedFirefighter() {
@@ -107,7 +123,7 @@ public class HoursControllerTest {
 
     public Hours givenSavedHours(Month savedMonth, Firefighter savedFighter) {
         Hours hours = new Hours();
-        hours.setDate(LocalDate.now());
+        hours.setDate(DATE);
         hours.setFactHours(12);
         hours.setFirefighter(savedFighter);
         hours.setMonth(savedMonth);

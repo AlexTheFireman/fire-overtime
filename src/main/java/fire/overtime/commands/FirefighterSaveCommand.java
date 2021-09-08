@@ -1,10 +1,5 @@
 package fire.overtime.commands;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 public class FirefighterSaveCommand {
 
     private String firstName;

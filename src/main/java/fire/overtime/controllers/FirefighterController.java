@@ -8,8 +8,6 @@ import fire.overtime.services.FirefighterService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-
 @RestController
 @RequestMapping("/firefighter")
 public class FirefighterController {
@@ -32,7 +30,7 @@ public class FirefighterController {
         return firefighterService.updateFirefighter(firefighterUpdateCommand);
     }
 
-    @DeleteMapping(value = "/delete/{firefighterId}")
+    @DeleteMapping(value = "/{firefighterId}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteFirefighter(@PathVariable Integer firefighterId) {
         firefighterRepository.deleteById(firefighterId);

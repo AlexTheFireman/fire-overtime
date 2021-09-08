@@ -21,7 +21,7 @@ public class Month {
     @Column(name = "year")
     private int year;
 
-    @OneToMany(mappedBy = "month", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "month")
     private Set<Hours> hours = new HashSet<>();
 
     public Month(Integer monthId) {

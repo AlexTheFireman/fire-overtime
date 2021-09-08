@@ -50,7 +50,7 @@ public class HoursController {
         return hoursService.getOvertimePerYear(firefighterId, periodId);
     }
 
-    @DeleteMapping(value = "/delete/{firefighterId}/{date}")
+    @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteHours(@PathVariable Integer firefighterId, LocalDate date) {
         hoursService.deleteHours(firefighterId, date);

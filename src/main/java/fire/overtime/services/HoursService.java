@@ -3,14 +3,12 @@ package fire.overtime.services;
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
 import fire.overtime.models.Enums.HourType;
-import fire.overtime.models.Firefighter;
 import fire.overtime.models.Hours;
-import fire.overtime.models.Month;
+import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
 import fire.overtime.repositories.MonthRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
@@ -28,6 +26,8 @@ public class HoursService {
     private HoursRepository hoursRepository;
     @Autowired
     private MonthRepository monthRepository;
+    @Autowired
+    FirefighterRepository firefighterRepository;
     @Autowired
     private MonthService monthService;
 
@@ -55,11 +55,11 @@ public class HoursService {
         }
 
         if (hoursUpdateCommand.getFirefighterId() != null) {
-            hours.setFirefighter(new Firefighter(hoursUpdateCommand.getFirefighterId()));
+            hours.setFirefighter(firefighterRepository.getById(hoursUpdateCommand.getFirefighterId()));
         }
 
         if (hoursUpdateCommand.getMonthId() != null) {
-            hours.setMonth(new Month(hoursUpdateCommand.getMonthId()));
+            hours.setMonth(monthRepository.getById(hoursUpdateCommand.getMonthId()));
         }
 
         return hoursRepository.save(hours);
@@ -70,8 +70,9 @@ public class HoursService {
         hours.setDate(hoursSaveCommand.getDate());
         hours.setFactHours(hoursSaveCommand.getFactHours());
         hours.setHoursType(hoursSaveCommand.getHoursType());
-        hours.setFirefighter(new Firefighter(hoursSaveCommand.getFirefighterId()));
-        hours.setMonth(new Month(hoursSaveCommand.getMonthId()));
+        hours.setFirefighter(firefighterRepository.getById(hoursSaveCommand.getFirefighterId()));
+        hours.setFirefighterId(hoursSaveCommand.getFirefighterId());
+        hours.setMonth(monthRepository.getById(hoursSaveCommand.getMonthId()));
 
         return hoursRepository.save(hours);
     }

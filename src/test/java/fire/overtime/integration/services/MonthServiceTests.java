@@ -30,4 +30,3 @@ public class MonthServiceTests {
         monthService.setMonthsByYear(2021, monthService.setNormWorkingHoursForMonths());
     }
 }
-
