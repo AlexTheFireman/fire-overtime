@@ -6,9 +6,17 @@ import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.services.HoursService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.time.LocalDate;
 
 @RestController
@@ -44,16 +52,23 @@ public class HoursController {
         return hoursService.getOvertimePerMonth(firefighterId, periodId);
     }
 
-    @GetMapping(value = "/firefighter/{firefighterId}/overtime/year/{periodId}")
+    @GetMapping(value = "/overtime", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public int getYearOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) {
+    public int getYearOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) throws IOException {
+
         return hoursService.getOvertimePerYear(firefighterId, periodId);
     }
 
     @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteHours(@PathVariable Integer firefighterId, LocalDate date) {
+    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         hoursService.deleteHours(firefighterId, date);
+    }
+
+    @GetMapping(produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public int getYearOvertime2() {
+        return 13;
     }
 }
 

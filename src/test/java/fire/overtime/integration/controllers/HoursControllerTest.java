@@ -91,17 +91,14 @@ public class HoursControllerTest {
 
     @Test
     public void deleteHours_success() throws Exception {
-//        MockHttpServletRequestBuilder updateTargetBuilder = MockMvcRequestBuilders.delete(
-//                "/hours/firefighter/{firefighterId}/{date}",
-//                testHoursSavedCommand.getFirefighterId(),
-//                testHoursSavedCommand.getDate());
-//        MvcResult mvcResult = this.mockMvc.perform(updateTargetBuilder).andDo(print()).andExpect(status().isOk()).andReturn();
-//        Hours hours = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), Hours.class);
         MockHttpServletRequestBuilder updateTargetBuilder = MockMvcRequestBuilders.delete(
-                "/hours/firefighter/{firefighterId}/{date}", 1, DATE);
+                "/hours/firefighter/{firefighterId}/{date}",
+                testHoursSavedCommand.getFirefighterId(), DATE);
         this.mockMvc.perform(updateTargetBuilder).andExpect(status().isOk()).andReturn();
         assertNull(hoursRepository.getHoursByDateAndFirefighterId(
                 testHoursSavedCommand.getDate(),testHoursSavedCommand.getFirefighterId()));
+
+
     }
 
     private Firefighter givenSavedFirefighter() {

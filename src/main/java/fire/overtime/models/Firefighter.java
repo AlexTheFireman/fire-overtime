@@ -8,6 +8,17 @@ import java.util.Set;
 @Table(name = "firefighter")
 
 public class Firefighter {
+    @Override
+    public String toString() {
+        return "Firefighter{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", patronymic='" + patronymic + '\'' +
+                ", position='" + position + '\'' +
+                ", hours=" + hours +
+                '}';
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
