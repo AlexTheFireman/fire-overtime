@@ -53,19 +53,11 @@ public class FirefighterController {
         firefighterRepository.getById(firefighterId);
     }
 
-    @GetMapping(value = "/all")
+    @GetMapping(value = "/all", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List<Firefighter> all() {
-        Firefighter firefighter = new Firefighter();
-        firefighter.setLastName("kjjk");
-        firefighter.setPatronymic("kij");
-        return Arrays.asList(firefighter);
+    public List getAllFirefighters() throws IOException {
+        return firefighterRepository.findAll();
+
     }
-//    @GetMapping(value = "/all", produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List getAllFirefighters() throws IOException {
-////        return firefighterRepository.findAll();
-//
-//    }
 }
 

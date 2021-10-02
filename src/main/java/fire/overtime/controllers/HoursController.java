@@ -1,5 +1,6 @@
 package fire.overtime.controllers;
 
+
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
 import fire.overtime.models.Enums.HourType;
@@ -8,6 +9,7 @@ import fire.overtime.services.HoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
@@ -15,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.time.LocalDate;
 
@@ -51,6 +52,19 @@ public class HoursController {
     public int getMonthOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) {
         return hoursService.getOvertimePerMonth(firefighterId, periodId);
     }
+
+    @GetMapping(value = "/1", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public int getYearOvertime() throws IOException {
+        return hoursService.getYearNormaHours(2021);
+    }
+
+//    @GetMapping(value = "/2", produces = "application/json")
+//    @ResponseStatus(HttpStatus.OK)
+//    public String getDay() throws IOException {
+//        hoursService.getDay();
+//        return hoursService.getDay();
+//    }
 
     @GetMapping(value = "/overtime", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
