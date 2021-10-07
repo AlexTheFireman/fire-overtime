@@ -9,13 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
+
 import java.util.List;
 
 @RestController
@@ -55,9 +50,9 @@ public class FirefighterController {
 
     @GetMapping(value = "/all", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public List getAllFirefighters() throws IOException {
-        return firefighterRepository.findAll();
-
+    public String getAllFirefighters() throws IOException {
+//        return firefighterRepository.findAll();
+        return "Novikov";
     }
 }
 
