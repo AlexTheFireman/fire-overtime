@@ -1,4 +1,4 @@
-package fire.overtime.commands;
+package fire.overtime.dto;
 
 import fire.overtime.models.Enums.HourType;
 import lombok.Getter;
@@ -6,18 +6,13 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-
 @Getter
 @Setter
-public class HoursSaveCommand {
-    private Integer firefighterId;
+public class HoursDto {
+
+    private int id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer monthId;
-    private int factHours;
+    private Integer factHours;
     private HourType hoursType;
-
-    public HoursSaveCommand() {
-    }
 }
-

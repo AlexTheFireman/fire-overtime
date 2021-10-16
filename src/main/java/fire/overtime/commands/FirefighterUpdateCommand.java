@@ -1,5 +1,10 @@
 package fire.overtime.commands;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class FirefighterUpdateCommand {
 
     private Integer firefighterIdForUpdate;
@@ -9,47 +14,6 @@ public class FirefighterUpdateCommand {
     private String position;
 
     public FirefighterUpdateCommand(){
-
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPatronymic() {
-        return patronymic;
-    }
-
-    public void setPatronymic(String patronymic) {
-        this.patronymic = patronymic;
-    }
-
-    public String getPosition() {
-        return position;
-    }
-
-    public void setPosition(String position) {
-        this.position = position;
-    }
-
-    public Integer getFirefighterIdForUpdate() {
-        return firefighterIdForUpdate;
-    }
-
-    public void setFirefighterIdForUpdate(Integer firefighterIdForUpdate) {
-        this.firefighterIdForUpdate = firefighterIdForUpdate;
     }
 }
 

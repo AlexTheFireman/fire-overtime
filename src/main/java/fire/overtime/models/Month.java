@@ -1,10 +1,15 @@
 package fire.overtime.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "month_year")
 public class Month {
 
@@ -29,38 +34,6 @@ public class Month {
 
     public Month() {
 
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getMonthName() {
-        return monthName;
-    }
-
-    public void setMonthName(String monthName) {
-        this.monthName = monthName;
-    }
-
-    public Integer getNormaHours() {
-        return normaHours;
-    }
-
-    public void setNormaHours(Integer normaHours) {
-        this.normaHours = normaHours;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
     }
 }
 

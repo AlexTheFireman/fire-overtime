@@ -1,6 +1,6 @@
 package fire.overtime.models.Enums;
 
 public enum HourType {
-    WORK, VACATION
+    WORK, VACATION, SICK, DAYOFF
 }
 

@@ -1,31 +1,43 @@
 package fire.overtime.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import fire.overtime.models.Enums.HourType;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "hours")
 public class Hours {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer hoursId;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "firefighter_id")
+    @JsonBackReference
     private Firefighter firefighter;
 
     @Column(name = "firefighter_id", insertable = false, updatable = false)
     private Integer firefighterId;
 
+    @Column(name = "month_year_id", insertable = false, updatable = false)
+    private Integer monthId;
+
     @ManyToOne
     @JoinColumn(name = "month_year_id")
     private Month month;
 
-    @Column(name = "date")
-    private LocalDate date;
+    @Column(name = "start_date")
+    private LocalDate startDate;
+
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
     @Column(name = "fact_hours")
     private Integer factHours;
@@ -34,60 +46,5 @@ public class Hours {
     @Enumerated(EnumType.STRING)
     private HourType hoursType;
 
-    public Integer getId() {
-        return hoursId;
-    }
-
-    public void setId(Integer hoursId) {
-        this.hoursId = hoursId;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public int getFactHours() {
-        return factHours;
-    }
-
-    public void setFactHours(int factHours) {
-        this.factHours = factHours;
-    }
-
-    public HourType getHoursType() {
-        return hoursType;
-    }
-
-    public void setHoursType(HourType hoursType) {
-        this.hoursType = hoursType;
-    }
-
-    public Firefighter getFirefighter() {
-        return firefighter;
-    }
-
-    public void setFirefighter(Firefighter firefighter) {
-        this.firefighter = firefighter;
-    }
-
-    public Month getMonth() {
-        return month;
-    }
-
-    public void setMonth(Month month) {
-        this.month = month;
-    }
-
-    public Integer getFirefighterId() {
-        return firefighterId;
-    }
-
-    public void setFirefighterId(Integer firefighterId) {
-        this.firefighterId = firefighterId;
-    }
 }
 

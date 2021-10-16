@@ -2,11 +2,13 @@ package fire.overtime.services;
 
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
+import fire.overtime.dto.HoursDto;
 import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
 import fire.overtime.repositories.MonthRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -20,6 +22,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fire.overtime.models.Enums.HourType.VACATION;
 import static fire.overtime.models.Enums.HourType.WORK;
@@ -34,13 +37,8 @@ public class HoursService {
     private MonthRepository monthRepository;
     @Autowired
     FirefighterRepository firefighterRepository;
-    @Autowired
-    private MonthService monthService;
 
-    @Autowired
-    public HoursService(HoursRepository hoursRepository) {
-        this.hoursRepository = hoursRepository;
-    }
+    private ModelMapper modelMapper;
 
     public Hours updateHours(HoursUpdateCommand hoursUpdateCommand) {
         Optional<Hours> byId = hoursRepository.findById(hoursUpdateCommand.getHourIdForUpdate());
@@ -48,8 +46,16 @@ public class HoursService {
             throw new RuntimeException(String.format("Hours with id %d should be present", hoursUpdateCommand.getHourIdForUpdate()));
 
         Hours hours = byId.get();
-        if (hoursUpdateCommand.getDate() != null) {
-            hours.setDate(hoursUpdateCommand.getDate());
+        if (hoursUpdateCommand.getStartDate() != null) {
+            hours.setStartDate(hoursUpdateCommand.getStartDate());
+        }
+
+        if (hoursUpdateCommand.getStartDate() != null) {
+            hours.setStartDate(hoursUpdateCommand.getStartDate());
+        }
+
+        if (hoursUpdateCommand.getEndDate() != null) {
+            hours.setEndDate(hoursUpdateCommand.getEndDate());
         }
 
         if (hoursUpdateCommand.getFactHours() > 0) {
@@ -61,11 +67,11 @@ public class HoursService {
         }
 
         if (hoursUpdateCommand.getFirefighterId() != null) {
-            hours.setFirefighter(firefighterRepository.getById(hoursUpdateCommand.getFirefighterId()));
+            hours.setFirefighterId(hoursUpdateCommand.getFirefighterId());
         }
 
         if (hoursUpdateCommand.getMonthId() != null) {
-            hours.setMonth(monthRepository.getById(hoursUpdateCommand.getMonthId()));
+            hours.setMonthId(hoursUpdateCommand.getMonthId());
         }
 
         return hoursRepository.save(hours);
@@ -73,12 +79,12 @@ public class HoursService {
 
     public Hours saveHours(HoursSaveCommand hoursSaveCommand) {
         Hours hours = new Hours();
-        hours.setDate(hoursSaveCommand.getDate());
+        hours.setStartDate(hoursSaveCommand.getStartDate());
+        hours.setEndDate(hoursSaveCommand.getEndDate());
         hours.setFactHours(hoursSaveCommand.getFactHours());
         hours.setHoursType(hoursSaveCommand.getHoursType());
-        hours.setFirefighter(firefighterRepository.getById(hoursSaveCommand.getFirefighterId()));
         hours.setFirefighterId(hoursSaveCommand.getFirefighterId());
-        hours.setMonth(monthRepository.getById(hoursSaveCommand.getMonthId()));
+        hours.setMonthId(hoursSaveCommand.getMonthId());
 
         return hoursRepository.save(hours);
     }
@@ -111,8 +117,8 @@ public class HoursService {
         return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
     }
 
-    public void deleteHours(Integer firefighterId, LocalDate date) {
-        hoursRepository.deleteByFirefighterIdAndDate(firefighterId, date);
+    public void deleteHours(Integer firefighterId, LocalDate startDate) {
+        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
     }
 
     public int getYearNormaHours(int year) throws IOException {
@@ -140,7 +146,7 @@ public class HoursService {
         System.out.println("Ковидных : " + covidWorkDays);
         return (workDays * 8) + (partTimeDays * 7);
     }
-
+    
 //    public int getMonthNormaHours(int monthId) throws IOException {
 //        int month = ...;
 //        int year = ...;
