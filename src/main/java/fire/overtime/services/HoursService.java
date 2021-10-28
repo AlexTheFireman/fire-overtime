@@ -7,7 +7,7 @@ import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
-import fire.overtime.repositories.MonthRepository;
+//import fire.overtime.repositories.MonthRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static fire.overtime.models.Enums.HourType.VACATION;
 import static fire.overtime.models.Enums.HourType.WORK;
@@ -33,8 +32,8 @@ public class HoursService {
 
     @Autowired
     private HoursRepository hoursRepository;
-    @Autowired
-    private MonthRepository monthRepository;
+//    @Autowired
+//    private MonthRepository monthRepository;
     @Autowired
     FirefighterRepository firefighterRepository;
 
@@ -70,56 +69,58 @@ public class HoursService {
             hours.setFirefighterId(hoursUpdateCommand.getFirefighterId());
         }
 
-        if (hoursUpdateCommand.getMonthId() != null) {
-            hours.setMonthId(hoursUpdateCommand.getMonthId());
-        }
-
         return hoursRepository.save(hours);
     }
 
-    public Hours saveHours(HoursSaveCommand hoursSaveCommand) {
+    public void saveHours(HoursSaveCommand hoursSaveCommand) {
+        if(hoursSaveCommand.getHoursType().equals(WORK)) {
+            saveWorkedHours(hoursSaveCommand, 16,  false);
+            saveWorkedHours(hoursSaveCommand, 8,  true);
+        } else {
+            saveWorkedHours(hoursSaveCommand, hoursSaveCommand.getFactHours(),  false);
+        }
+    }
+
+    public Hours saveWorkedHours(HoursSaveCommand hoursSaveCommand, int hoursWorked, boolean isNextDay) {
         Hours hours = new Hours();
-        hours.setStartDate(hoursSaveCommand.getStartDate());
-        hours.setEndDate(hoursSaveCommand.getEndDate());
-        hours.setFactHours(hoursSaveCommand.getFactHours());
+        if (!isNextDay) {
+            hours.setStartDate(hoursSaveCommand.getStartDate());
+            hours.setEndDate(hoursSaveCommand.getEndDate());
+        } else {
+            hours.setStartDate(hoursSaveCommand.getStartDate());
+            hours.setEndDate(hoursSaveCommand.getEndDate());
+        }
+        hours.setFactHours(hoursWorked);
         hours.setHoursType(hoursSaveCommand.getHoursType());
         hours.setFirefighterId(hoursSaveCommand.getFirefighterId());
-        hours.setMonthId(hoursSaveCommand.getMonthId());
-
         return hoursRepository.save(hours);
     }
 
-    public int getHoursPerPeriodByType(int firefighterId, int periodId, HourType hoursType) {
-        List<Hours> hoursPerPeriodList;
-        if (periodId < 2000) {
-            hoursPerPeriodList = hoursRepository.getHoursByFirefighterIdAndMonthIdAndHoursType(
-                    firefighterId, periodId, hoursType);
-        } else {
-            hoursPerPeriodList = hoursRepository.getHoursByFirefighterIdAndMonth_YearAndHoursType(
-                    firefighterId, periodId, hoursType);
-        }
-
-        return hoursPerPeriodList.stream().mapToInt(Hours::getFactHours).sum();
+    public int getHoursPerYearByType(int firefighterId, HourType hoursType, int year) {
+        List<Hours> hoursPerYearList;
+        hoursPerYearList = hoursRepository.getHoursByFirefighterAndYearAndType(
+                    firefighterId, hoursType, year);
+        return hoursPerYearList.stream().mapToInt(Hours::getFactHours).sum();
     }
+//
+//    public void getOvertimePerMonth(int firefighterId, int month, int year) {
+//        int workingHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId,
+//                WORK);
+//        int vacationHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId, VACATION);
+////        Integer normWorkingHoursPerMonth = monthRepository.getById(monthYearId).getNormaHours();
+////        return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
+//    }
+//
+//    public int getOvertimePerYear(int firefighterId, int year) throws IOException {
+//        int workingHoursPerYear = getHoursPerPeriodByType(firefighterId, year, WORK);
+//        int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, VACATION);
+//        int normWorkingHoursPerYear =  getYearNormaHours(year);
+//        return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
+//    }
 
-    public int getOvertimePerMonth(int firefighterId, int monthYearId) {
-        int workingHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId,
-                WORK);
-        int vacationHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId, VACATION);
-        Integer normWorkingHoursPerMonth = monthRepository.getById(monthYearId).getNormaHours();
-        return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
-    }
-
-    public int getOvertimePerYear(int firefighterId, Integer year) throws IOException {
-        int workingHoursPerYear = getHoursPerPeriodByType(firefighterId, year, WORK);
-        int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, VACATION);
-        int normWorkingHoursPerYear =  getYearNormaHours(year);
-        return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
-    }
-
-    public void deleteHours(Integer firefighterId, LocalDate startDate) {
-        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
-    }
+//    public void deleteHours(Integer firefighterId, LocalDate startDate) {
+//        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
+//    }
 
     public int getYearNormaHours(int year) throws IOException {
         final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&cc=ru&pre=1&&covid=1";
@@ -146,7 +147,7 @@ public class HoursService {
         System.out.println("Ковидных : " + covidWorkDays);
         return (workDays * 8) + (partTimeDays * 7);
     }
-    
+
 //    public int getMonthNormaHours(int monthId) throws IOException {
 //        int month = ...;
 //        int year = ...;

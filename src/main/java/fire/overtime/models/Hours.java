@@ -26,13 +26,6 @@ public class Hours {
     @Column(name = "firefighter_id", insertable = false, updatable = false)
     private Integer firefighterId;
 
-    @Column(name = "month_year_id", insertable = false, updatable = false)
-    private Integer monthId;
-
-    @ManyToOne
-    @JoinColumn(name = "month_year_id")
-    private Month month;
-
     @Column(name = "start_date")
     private LocalDate startDate;
 
