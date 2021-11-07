@@ -13,8 +13,7 @@ public class HoursSaveCommand {
     private Integer firefighterId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Integer monthId;
-    private int factHours;
+    private int amountHours;
     private HourType hoursType;
 
     public HoursSaveCommand() {

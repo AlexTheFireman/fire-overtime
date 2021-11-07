@@ -23,8 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static fire.overtime.models.Enums.HourType.VACATION;
-import static fire.overtime.models.Enums.HourType.WORK;
+import static fire.overtime.models.Enums.HourType.*;
 
 @Service
 @Transactional
@@ -32,8 +31,7 @@ public class HoursService {
 
     @Autowired
     private HoursRepository hoursRepository;
-//    @Autowired
-//    private MonthRepository monthRepository;
+
     @Autowired
     FirefighterRepository firefighterRepository;
 
@@ -48,27 +46,21 @@ public class HoursService {
         if (hoursUpdateCommand.getStartDate() != null) {
             hours.setStartDate(hoursUpdateCommand.getStartDate());
         }
-
         if (hoursUpdateCommand.getStartDate() != null) {
             hours.setStartDate(hoursUpdateCommand.getStartDate());
         }
-
         if (hoursUpdateCommand.getEndDate() != null) {
             hours.setEndDate(hoursUpdateCommand.getEndDate());
         }
-
-        if (hoursUpdateCommand.getFactHours() > 0) {
-            hours.setFactHours(hoursUpdateCommand.getFactHours());
+        if (hoursUpdateCommand.getAmountHours() > 0) {
+            hours.setAmountHours(hoursUpdateCommand.getAmountHours());
         }
-
         if (hoursUpdateCommand.getHoursType() != null) {
             hours.setHoursType(hoursUpdateCommand.getHoursType());
         }
-
         if (hoursUpdateCommand.getFirefighterId() != null) {
             hours.setFirefighterId(hoursUpdateCommand.getFirefighterId());
         }
-
         return hoursRepository.save(hours);
     }
 
@@ -77,7 +69,7 @@ public class HoursService {
             saveWorkedHours(hoursSaveCommand, 16,  false);
             saveWorkedHours(hoursSaveCommand, 8,  true);
         } else {
-            saveWorkedHours(hoursSaveCommand, hoursSaveCommand.getFactHours(),  false);
+            saveWorkedHours(hoursSaveCommand, hoursSaveCommand.getAmountHours(),  false);
         }
     }
 
@@ -87,42 +79,53 @@ public class HoursService {
             hours.setStartDate(hoursSaveCommand.getStartDate());
             hours.setEndDate(hoursSaveCommand.getEndDate());
         } else {
-            hours.setStartDate(hoursSaveCommand.getStartDate());
-            hours.setEndDate(hoursSaveCommand.getEndDate());
+            hours.setStartDate(hoursSaveCommand.getStartDate().plusDays(1));
+            hours.setEndDate(hoursSaveCommand.getEndDate().plusDays(1));
         }
-        hours.setFactHours(hoursWorked);
+        hours.setAmountHours(hoursWorked);
         hours.setHoursType(hoursSaveCommand.getHoursType());
         hours.setFirefighterId(hoursSaveCommand.getFirefighterId());
+        hours.setFirefighter(firefighterRepository.getById(hoursSaveCommand.getFirefighterId()));
         return hoursRepository.save(hours);
     }
 
-    public int getHoursPerYearByType(int firefighterId, HourType hoursType, int year) {
-        List<Hours> hoursPerYearList;
-        hoursPerYearList = hoursRepository.getHoursByFirefighterAndYearAndType(
+    public int getAnnualHoursByFirefighterIdAndType(int firefighterId, String hoursType, int year) {
+        List<Hours> hoursPerYearList = hoursRepository.getAnnualHoursByTypeAndFirefighter(
                     firefighterId, hoursType, year);
-        return hoursPerYearList.stream().mapToInt(Hours::getFactHours).sum();
+        return hoursPerYearList.stream().mapToInt(Hours::getAmountHours).sum();
     }
-//
-//    public void getOvertimePerMonth(int firefighterId, int month, int year) {
-//        int workingHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId,
-//                WORK);
-//        int vacationHoursPerMonth = getHoursPerPeriodByType(firefighterId, monthYearId, VACATION);
-////        Integer normWorkingHoursPerMonth = monthRepository.getById(monthYearId).getNormaHours();
-////        return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
-//    }
-//
-//    public int getOvertimePerYear(int firefighterId, int year) throws IOException {
-//        int workingHoursPerYear = getHoursPerPeriodByType(firefighterId, year, WORK);
-//        int vacationHoursPerYear = getHoursPerPeriodByType(firefighterId, year, VACATION);
-//        int normWorkingHoursPerYear =  getYearNormaHours(year);
-//        return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
-//    }
 
-//    public void deleteHours(Integer firefighterId, LocalDate startDate) {
-//        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
-//    }
+    public int getMonthlyHoursByFirefighterIdAndType(int firefighterId, String hoursType, int year, int month) {
+        List<Hours> hoursPerMonthList = hoursRepository.getMonthlyHoursByTypeAndFirefighter(
+                firefighterId, hoursType, year, month);
+        return hoursPerMonthList.stream().mapToInt(Hours::getAmountHours).sum();
+    }
 
-    public int getYearNormaHours(int year) throws IOException {
+    public int getOvertimePerMonth(int firefighterId, int year, int month) throws IOException {
+        int workingHoursPerMonth = getMonthlyHoursByFirefighterIdAndType(firefighterId, "WORK", year, month) +
+                getMonthlyHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year, month);
+        int vacationHoursPerMonth = getMonthlyHoursByFirefighterIdAndType(firefighterId, "VACATION", year, month) +
+                getMonthlyHoursByFirefighterIdAndType(firefighterId, "SICK", year, month);
+        int normWorkingHoursPerMonth = getMonthNormaHours(year, month);
+        return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
+    }
+
+    public int getOvertimePerYear(int firefighterId, int year) throws IOException {
+        int workingHoursPerYear = getAnnualHoursByFirefighterIdAndType(firefighterId, "WORK", year) +
+                getAnnualHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year) +
+                getAnnualHoursByFirefighterIdAndType(firefighterId, "EIGHT", year);
+        System.out.println("Work hours: " + workingHoursPerYear);
+        int vacationHoursPerYear = getAnnualHoursByFirefighterIdAndType(firefighterId, "VACATION", year) +
+                getAnnualHoursByFirefighterIdAndType(firefighterId, "SICK", year);
+        int normWorkingHoursPerYear = getAnnualNormaHours(year);
+        return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
+    }
+
+    public void deleteHours(Integer firefighterId, LocalDate startDate) {
+        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
+    }
+
+    public int getAnnualNormaHours(int year) throws IOException {
         final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&cc=ru&pre=1&&covid=1";
         final String request = String.format(URL_FORMAT, year);
         URL url = new URL(request);
@@ -148,28 +151,26 @@ public class HoursService {
         return (workDays * 8) + (partTimeDays * 7);
     }
 
-//    public int getMonthNormaHours(int monthId) throws IOException {
-//        int month = ...;
-//        int year = ...;
-//        final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&month=%d";
-//        final String request = String.format(URL_FORMAT, year, month);
-//        URL url = new URL(request);
-//        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//        connection.setRequestMethod("GET");
-//        connection.connect();
-//        StringBuilder sb = new StringBuilder();
-//        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-//        String line;
-//        while((line = in.readLine()) != null) {
-//            sb.append(line);
-//        }
-//
-//        int daysOff = StringUtils.countOccurrencesOf(sb.toString(), "1");
-//        int workDays = StringUtils.countOccurrencesOf(sb.toString(), "0");
-//        int partTimeDays = StringUtils.countOccurrencesOf(sb.toString(), "2");
-//        int covidWorkDays = StringUtils.countOccurrencesOf(sb.toString(), "4");
-//
-//        return (workDays * 8) + (partTimeDays * 7);
-//    }
+    public int getMonthNormaHours(int year, int month) throws IOException {
+        final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&month=%d";
+        final String request = String.format(URL_FORMAT, year, month);
+        URL url = new URL(request);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        StringBuilder sb = new StringBuilder();
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String line;
+        while((line = in.readLine()) != null) {
+            sb.append(line);
+        }
+
+        int daysOff = StringUtils.countOccurrencesOf(sb.toString(), "1");
+        int workDays = StringUtils.countOccurrencesOf(sb.toString(), "0");
+        int partTimeDays = StringUtils.countOccurrencesOf(sb.toString(), "2");
+        int covidWorkDays = StringUtils.countOccurrencesOf(sb.toString(), "4");
+
+        return (workDays * 8) + (partTimeDays * 7);
+    }
 }
 

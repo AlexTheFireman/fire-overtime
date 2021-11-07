@@ -9,14 +9,14 @@ import fire.overtime.models.Hours;
 import fire.overtime.repositories.HoursRepository;
 import fire.overtime.services.HoursService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.modelmapper.TypeToken;
-import java.lang.reflect.Type;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -47,52 +47,41 @@ public class HoursController {
         return hoursService.updateHours(hoursUpdateCommand);
     }
 
-//    @GetMapping(value = "/firefighter/{firefighterId}/periods/{periodId}/{hoursType}")
+//    @GetMapping(value = "/all/firefighter/{firefighterId}/year/{year}")
 //    @ResponseStatus(HttpStatus.OK)
-//    public int getHoursPerPeriodByType(@PathVariable Integer firefighterId, @PathVariable Integer periodId, HourType hoursType) {
-//        return hoursService.getHoursPerPeriodByType(firefighterId, periodId, hoursType);
+//    public List<Hours> getAllHoursPerYear(@PathVariable Integer firefighterId, @PathVariable HourType hoursType,
+//            @PathVariable Integer year) {
+//        return hoursRepository.getHours(firefighterId,year);
 //    }
 
-//    @GetMapping(value = "/firefighter/{firefighterId}/overtime/month/{periodId}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void getMonthOvertime(@PathVariable Integer firefighterId, @PathVariable Integer periodId) {
-//        return hoursService.getOvertimePerMonth(firefighterId, periodId);
-//    }
+    @GetMapping(value = "/all/firefighter/{firefighterId}/year/{year}", produces = "application/json")
+    @ResponseStatus(HttpStatus.OK)
+    public List<HoursDto> getAllYearHours(@PathVariable Integer firefighterId, @PathVariable Integer year) throws IOException {
+        ModelMapper modelMapper = new ModelMapper();
+        List<Hours> hours = hoursRepository.getHours(firefighterId, year);
+        hours.removeIf(h -> (h.getHoursType() == WORK && h.getAmountHours() == 8));
+        Type listType = new TypeToken<List<HoursDto>>(){}.getType();
+        hours.forEach(System.out::println);
+        List<HoursDto> hoursDtoList = modelMapper.map(hours,listType);
+        return hoursDtoList;
+    }
 
-//    @GetMapping(value = "/1", produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public int getYearOvertime() throws IOException {
-//        return hoursService.getYearNormaHours(2021);
-//    }
+    @GetMapping(value = "/firefighter/{firefighterId}/overtime/{year}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getAnnualOvertime(@PathVariable Integer firefighterId, @PathVariable Integer year) throws IOException {
+        return hoursService.getOvertimePerYear(firefighterId, year);
+    }
 
-//    @GetMapping(value = "/all", produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<HoursDto> getDays() throws IOException {
-//        ModelMapper modelMapper = new ModelMapper();
-//        List<Hours> hours = hoursRepository.getHours(1, 1);
-//        hours.removeIf(h -> (h.getHoursType() == WORK && h.getFactHours() == 8));
-//        Type listType = new TypeToken<List<HoursDto>>(){}.getType();
-//        hours.forEach(System.out::println);
-//        List<HoursDto> hoursDtoList = modelMapper.map(hours,listType);
-//        return hoursDtoList;
-//    }
+    @GetMapping(value = "/firefighter/{firefighterId}/overtime/{year}/month/{month}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getMonthlyOvertime(@PathVariable Integer firefighterId, @PathVariable Integer year, @PathVariable Integer month) throws IOException {
+        return hoursService.getOvertimePerMonth(firefighterId, year, month);
+    }
 
-//    @GetMapping(value = "/overtime/{year}", produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public int getYearOvertime(@PathVariable Integer firefighterId, @PathVariable Integer year) throws IOException {
-//        return hoursService.getOvertimePerYear(firefighterId, year);
-//    }
-
-//    @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-//        hoursService.deleteHours(firefighterId, date);
-//    }
-
-//    @GetMapping(produces = "application/json")
-//    @ResponseStatus(HttpStatus.OK)
-//    public int getYearOvertime2() {
-//        return 13;
-//    }
+    @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+        hoursService.deleteHours(firefighterId, date);
+    }
 }
 

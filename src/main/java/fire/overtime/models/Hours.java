@@ -32,8 +32,8 @@ public class Hours {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "fact_hours")
-    private Integer factHours;
+    @Column(name = "hours_amount")
+    private Integer amountHours;
 
     @Column(name = "hours_type")
     @Enumerated(EnumType.STRING)

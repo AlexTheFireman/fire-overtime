@@ -45,12 +45,5 @@ public class FirefighterController {
     public void getFirefighter(@PathVariable Integer firefighterId) {
         firefighterRepository.getById(firefighterId);
     }
-
-    @GetMapping(value = "/all", produces = "application/json")
-    @ResponseStatus(HttpStatus.OK)
-    public String getAllFirefighters() throws IOException {
-//        return firefighterRepository.findAll();
-        return "Novikov";
-    }
 }
 

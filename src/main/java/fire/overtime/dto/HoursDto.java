@@ -8,11 +8,12 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
-public class HoursDto {
+public class
+HoursDto {
 
     private int id;
-    private LocalDate start_date;
-    private LocalDate end_date;
-    private Integer factHours;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private Integer amountHours;
     private HourType hoursType;
 }

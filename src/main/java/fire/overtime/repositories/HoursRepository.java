@@ -11,29 +11,25 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
-import static java.util.Calendar.YEAR;
-import static org.hibernate.loader.Loader.SELECT;
-
 @Repository
 @Transactional
 public interface HoursRepository extends JpaRepository<Hours, Integer> {
 
-//    @Query("select h from Hours h where h.firefighter.id=:firefighterId and h.month.id= :monthYearId")
-//    List<Hours> getHours(@Param("firefighterId") Integer firefighterId, @Param("monthYearId") Integer monthYearId);
+    @Query(value = "select * from Hours h where h.firefighter_Id=:firefighterId and year(start_date)=:year", nativeQuery = true)
+    List<Hours> getHours(@Param("firefighterId") Integer firefighterId, @Param("year") Integer year);
 
-    @Query("select h from Hours h where year(h.startDate) = :year")
-    List<Hours> getHoursByFirefighterAndYearAndType(
+    @Query(value = "select * from Hours h where h.firefighter_Id=:firefighterId and h.hours_type=:hoursType and year(start_date)=:year", nativeQuery = true)
+    List<Hours> getAnnualHoursByTypeAndFirefighter(
             @Param("firefighterId")Integer firefighterId,
-            @Param("hoursType") HourType hoursType,
+            @Param("hoursType") String hoursType,
             @Param("year") Integer year);
 
-//    List<Hours> getHoursByFirefighterIdAndMonth_YearAndHoursType(
-//            Integer firefighterId, int year, HourType hoursType);
-//
-//    void deleteByFirefighterIdAndStartDate(Integer firefighterId, LocalDate startDate);
-//
-//    Hours getHoursByStartDateAndFirefighterId(LocalDate startDate, Integer firefighterId);
-//
-//    List<Hours> getHoursByFirefighterId(Integer firefighterId);
+    @Query(value = "select * from Hours h where h.firefighter_Id=:firefighterId and h.hours_type=:hoursType and year(start_date)=:year and month(start_date)=:month", nativeQuery = true)
+    List<Hours> getMonthlyHoursByTypeAndFirefighter(
+            @Param("firefighterId")Integer firefighterId,
+            @Param("hoursType") String hoursType,
+            @Param("year") Integer year,
+            @Param("month") Integer month);
 
+    void deleteByFirefighterIdAndStartDate(Integer firefighterId, LocalDate startDate);
 }
