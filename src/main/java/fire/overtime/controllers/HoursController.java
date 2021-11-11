@@ -47,13 +47,6 @@ public class HoursController {
         return hoursService.updateHours(hoursUpdateCommand);
     }
 
-//    @GetMapping(value = "/all/firefighter/{firefighterId}/year/{year}")
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<Hours> getAllHoursPerYear(@PathVariable Integer firefighterId, @PathVariable HourType hoursType,
-//            @PathVariable Integer year) {
-//        return hoursRepository.getHours(firefighterId,year);
-//    }
-
     @GetMapping(value = "/all/firefighter/{firefighterId}/year/{year}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
     public List<HoursDto> getAllYearHours(@PathVariable Integer firefighterId, @PathVariable Integer year) throws IOException {
@@ -80,7 +73,7 @@ public class HoursController {
 
     @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
+    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable LocalDate date) {
         hoursService.deleteHours(firefighterId, date);
     }
 }

@@ -2,8 +2,6 @@ package fire.overtime.services;
 
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
-import fire.overtime.dto.HoursDto;
-import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
@@ -20,8 +18,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static fire.overtime.models.Enums.HourType.*;
 
@@ -106,54 +106,63 @@ public class HoursService {
                 getMonthlyHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year, month);
         int vacationHoursPerMonth = getMonthlyHoursByFirefighterIdAndType(firefighterId, "VACATION", year, month) +
                 getMonthlyHoursByFirefighterIdAndType(firefighterId, "SICK", year, month);
-        int normWorkingHoursPerMonth = getMonthNormaHours(year, month);
-        return workingHoursPerMonth - (normWorkingHoursPerMonth - vacationHoursPerMonth);
+        return workingHoursPerMonth - (getNormaHours(year, month) - vacationHoursPerMonth);
     }
 
     public int getOvertimePerYear(int firefighterId, int year) throws IOException {
         int workingHoursPerYear = getAnnualHoursByFirefighterIdAndType(firefighterId, "WORK", year) +
                 getAnnualHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year) +
                 getAnnualHoursByFirefighterIdAndType(firefighterId, "EIGHT", year);
-        System.out.println("Work hours: " + workingHoursPerYear);
-        int vacationHoursPerYear = getAnnualHoursByFirefighterIdAndType(firefighterId, "VACATION", year) +
-                getAnnualHoursByFirefighterIdAndType(firefighterId, "SICK", year);
-        int normWorkingHoursPerYear = getAnnualNormaHours(year);
-        return workingHoursPerYear - (normWorkingHoursPerYear - vacationHoursPerYear);
+        return workingHoursPerYear - (getNormaHours(year, 0) - getAnnualLegalDayOffHours(firefighterId, year));
     }
 
+    public int getAnnualLegalDayOffHours(int firefighterId, int year) throws IOException {
+        List<Hours> vacationHoursPerYearList = hoursRepository.getAnnualHoursByTypeAndFirefighter(
+                firefighterId, "VACATION", year);
+        List<Hours> sickHoursPerYearList = hoursRepository.getAnnualHoursByTypeAndFirefighter(
+                firefighterId, "SICK", year);
+
+        return getLegalNonWorkingHoursInRange(vacationHoursPerYearList) + getLegalNonWorkingHoursInRange(sickHoursPerYearList);
+    }
+
+    private int getLegalNonWorkingHoursInRange(List<Hours> hoursList) throws IOException {
+        int daysToCount = 0;
+        for(Hours hour : hoursList) {
+            DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+            String startDate = hour.getStartDate().format(formatter);
+            String endDate = hour.getEndDate().format(formatter);
+            final String URL_RANGE_FORMAT = "https://isdayoff.ru/api/getdata?date1=%s&date2=%s&cc=ru&covid=1";
+            StringBuilder sb = getDaysStringFromIsDayOffService(String.format(URL_RANGE_FORMAT, startDate, endDate));
+            daysToCount += StringUtils.countOccurrencesOf(sb.toString(), "0");
+        }
+        return (daysToCount * 8);
+    }
     public void deleteHours(Integer firefighterId, LocalDate startDate) {
         hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
     }
 
-    public int getAnnualNormaHours(int year) throws IOException {
-        final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&cc=ru&pre=1&&covid=1";
-        final String request = String.format(URL_FORMAT, year);
-        URL url = new URL(request);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-        StringBuilder sb = new StringBuilder();
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String line;
-        while((line = in.readLine()) != null) {
-            sb.append(line);
+    public int getNormaHours(int year, int month) throws IOException {
+        StringBuilder sb;
+        if (month != 0) {
+            final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&month=%d&cc=ru&pre=1&covid=1";
+            sb = getDaysStringFromIsDayOffService(String.format(URL_FORMAT, year, month));
+        } else {
+            final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&cc=ru&pre=1&covid=1";
+            sb = getDaysStringFromIsDayOffService(String.format(URL_FORMAT, year));
         }
-
-        int daysOff = StringUtils.countOccurrencesOf(sb.toString(), "1");
+        System.out.println(sb);
         int workDays = StringUtils.countOccurrencesOf(sb.toString(), "0");
+        int daysOff = StringUtils.countOccurrencesOf(sb.toString(), "1");
         int partTimeDays = StringUtils.countOccurrencesOf(sb.toString(), "2");
         int covidWorkDays = StringUtils.countOccurrencesOf(sb.toString(), "4");
-        System.out.println(sb);
-        System.out.println("Рабочих: " + workDays);
-        System.out.println("Сокращенных: " + partTimeDays);
-        System.out.println("Выходных: " + daysOff);
-        System.out.println("Ковидных : " + covidWorkDays);
-        return (workDays * 8) + (partTimeDays * 7);
+        System.out.println("mРабочих: " + workDays);
+        System.out.println("mСокращенных: " + partTimeDays);
+        System.out.println("mВыходных: " + daysOff);
+        System.out.println("mcovid: " + covidWorkDays);
+        return (workDays * 8) + (partTimeDays * 7) + (covidWorkDays * 8);
     }
 
-    public int getMonthNormaHours(int year, int month) throws IOException {
-        final String URL_FORMAT = "https://isdayoff.ru/api/getdata?year=%d&month=%d";
-        final String request = String.format(URL_FORMAT, year, month);
+    private StringBuilder getDaysStringFromIsDayOffService (String request) throws IOException {
         URL url = new URL(request);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -164,13 +173,10 @@ public class HoursService {
         while((line = in.readLine()) != null) {
             sb.append(line);
         }
-
-        int daysOff = StringUtils.countOccurrencesOf(sb.toString(), "1");
-        int workDays = StringUtils.countOccurrencesOf(sb.toString(), "0");
-        int partTimeDays = StringUtils.countOccurrencesOf(sb.toString(), "2");
-        int covidWorkDays = StringUtils.countOccurrencesOf(sb.toString(), "4");
-
-        return (workDays * 8) + (partTimeDays * 7);
+        return sb;
+    }
+    public static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
+        return startDate.datesUntil(endDate).collect(Collectors.toList());
     }
 }
 
