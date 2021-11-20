@@ -22,6 +22,7 @@ import java.util.List;
 
 import static fire.overtime.models.Enums.HourType.WORK;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/hours")
 public class HoursController {
@@ -71,10 +72,10 @@ public class HoursController {
         return hoursService.getOvertimePerMonth(firefighterId, year, month);
     }
 
-    @DeleteMapping(value = "/firefighter/{firefighterId}/{date}")
+    @DeleteMapping(value = "/firefighter/{firefighterId}/{hoursType}/{date}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable LocalDate date) {
-        hoursService.deleteHours(firefighterId, date);
+    public void deleteHours(@PathVariable Integer firefighterId, @PathVariable HourType hoursType, @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        hoursService.deleteHours(firefighterId, hoursType, date);
     }
 }
 

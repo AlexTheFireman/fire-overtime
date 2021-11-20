@@ -2,6 +2,7 @@ package fire.overtime.services;
 
 import fire.overtime.commands.HoursSaveCommand;
 import fire.overtime.commands.HoursUpdateCommand;
+import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
@@ -137,8 +138,13 @@ public class HoursService {
         }
         return (daysToCount * 8);
     }
-    public void deleteHours(Integer firefighterId, LocalDate startDate) {
-        hoursRepository.deleteByFirefighterIdAndStartDate(firefighterId, startDate);
+    public void deleteHours(Integer firefighterId, HourType hoursType, LocalDate startDate) {
+        if (hoursType == WORK) {
+            hoursRepository.deleteByFirefighterIdAndHoursTypeAndStartDate(firefighterId, hoursType, startDate);
+            hoursRepository.deleteByFirefighterIdAndHoursTypeAndStartDate(firefighterId, hoursType, startDate.plusDays(1));
+        } else {
+            hoursRepository.deleteByFirefighterIdAndHoursTypeAndStartDate(firefighterId, hoursType, startDate);
+        }
     }
 
     public int getNormaHours(int year, int month) throws IOException {

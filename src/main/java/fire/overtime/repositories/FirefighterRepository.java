@@ -10,5 +10,7 @@ import javax.transaction.Transactional;
 @Transactional
 public interface FirefighterRepository extends JpaRepository<Firefighter, Integer> {
     void  deleteById(Integer id);
+
+    Firefighter findByLogin(String login);
 }
 

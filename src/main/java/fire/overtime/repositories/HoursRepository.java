@@ -31,5 +31,5 @@ public interface HoursRepository extends JpaRepository<Hours, Integer> {
             @Param("year") Integer year,
             @Param("month") Integer month);
 
-    void deleteByFirefighterIdAndStartDate(Integer firefighterId, LocalDate startDate);
+    void deleteByFirefighterIdAndHoursTypeAndStartDate(Integer firefighterId, HourType hoursType ,LocalDate startDate);
 }
