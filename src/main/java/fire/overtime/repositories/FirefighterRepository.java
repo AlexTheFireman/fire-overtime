@@ -12,5 +12,7 @@ public interface FirefighterRepository extends JpaRepository<Firefighter, Intege
     void  deleteById(Integer id);
 
     Firefighter findByLogin(String login);
+
+    Firefighter findByLoginAndPassword(String login, String password);
 }
 

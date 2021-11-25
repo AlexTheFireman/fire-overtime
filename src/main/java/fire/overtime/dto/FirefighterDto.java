@@ -1,19 +1,15 @@
-package fire.overtime.commands;
+package fire.overtime.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FirefighterUpdateCommand {
+public class FirefighterDto {
 
-    private Integer firefighterIdForUpdate;
     private String firstName;
     private String lastName;
     private String patronymic;
     private String position;
-
-    public FirefighterUpdateCommand(){
-    }
 }
 

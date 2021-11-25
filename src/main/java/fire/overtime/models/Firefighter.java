@@ -40,7 +40,10 @@ public class Firefighter {
     public Firefighter() {
     }
 
-    @Column(name = "login", columnDefinition = "varchar(255) default 'user12345'", unique = true)
+    @Column(name = "login", columnDefinition = "varchar(255)", unique = true)
     private String login;
+
+    @Column(name = "password", columnDefinition = "varchar(255)", unique = true)
+    private String password;
 }
 

@@ -6,7 +6,6 @@ import fire.overtime.models.Enums.HourType;
 import fire.overtime.models.Hours;
 import fire.overtime.repositories.FirefighterRepository;
 import fire.overtime.repositories.HoursRepository;
-//import fire.overtime.repositories.MonthRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,10 +103,9 @@ public class HoursService {
 
     public int getOvertimePerMonth(int firefighterId, int year, int month) throws IOException {
         int workingHoursPerMonth = getMonthlyHoursByFirefighterIdAndType(firefighterId, "WORK", year, month) +
-                getMonthlyHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year, month);
-        int vacationHoursPerMonth = getMonthlyHoursByFirefighterIdAndType(firefighterId, "VACATION", year, month) +
-                getMonthlyHoursByFirefighterIdAndType(firefighterId, "SICK", year, month);
-        return workingHoursPerMonth - (getNormaHours(year, month) - vacationHoursPerMonth);
+                getMonthlyHoursByFirefighterIdAndType(firefighterId, "EXTRA_WORK", year, month) +
+                getMonthlyHoursByFirefighterIdAndType(firefighterId, "EIGHT", year, month);
+        return workingHoursPerMonth - (getNormaHours(year, month) - getMonthlyLegalDayOffHours(firefighterId, year, month));
     }
 
     public int getOvertimePerYear(int firefighterId, int year) throws IOException {
@@ -117,27 +115,38 @@ public class HoursService {
         return workingHoursPerYear - (getNormaHours(year, 0) - getAnnualLegalDayOffHours(firefighterId, year));
     }
 
+
     public int getAnnualLegalDayOffHours(int firefighterId, int year) throws IOException {
         List<Hours> vacationHoursPerYearList = hoursRepository.getAnnualHoursByTypeAndFirefighter(
                 firefighterId, "VACATION", year);
         List<Hours> sickHoursPerYearList = hoursRepository.getAnnualHoursByTypeAndFirefighter(
                 firefighterId, "SICK", year);
+        return getLegalNonWorkingHoursInRange(vacationHoursPerYearList) + getLegalNonWorkingHoursInRange(sickHoursPerYearList);
+    }
 
+    public int getMonthlyLegalDayOffHours(int firefighterId, int year, int month) throws IOException {
+        List<Hours> vacationHoursPerYearList = hoursRepository.getMonthlyHoursByTypeAndFirefighter(
+                firefighterId, "VACATION", year, month);
+        List<Hours> sickHoursPerYearList = hoursRepository.getMonthlyHoursByTypeAndFirefighter(
+                firefighterId, "SICK", year, month);
         return getLegalNonWorkingHoursInRange(vacationHoursPerYearList) + getLegalNonWorkingHoursInRange(sickHoursPerYearList);
     }
 
     private int getLegalNonWorkingHoursInRange(List<Hours> hoursList) throws IOException {
-        int daysToCount = 0;
+        int daysOff = 0;
+        int shorterDays = 0;
         for(Hours hour : hoursList) {
             DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
             String startDate = hour.getStartDate().format(formatter);
             String endDate = hour.getEndDate().format(formatter);
-            final String URL_RANGE_FORMAT = "https://isdayoff.ru/api/getdata?date1=%s&date2=%s&cc=ru&covid=1";
+            final String URL_RANGE_FORMAT = "https://isdayoff.ru/api/getdata?date1=%s&date2=%s&cc=ru&covid=1&pre=1";
             StringBuilder sb = getDaysStringFromIsDayOffService(String.format(URL_RANGE_FORMAT, startDate, endDate));
-            daysToCount += StringUtils.countOccurrencesOf(sb.toString(), "0");
+            daysOff += StringUtils.countOccurrencesOf(sb.toString(), "0");
+            shorterDays += StringUtils.countOccurrencesOf(sb.toString(), "2");
         }
-        return (daysToCount * 8);
+        return ((daysOff * 8) + (shorterDays * 7));
     }
+
     public void deleteHours(Integer firefighterId, HourType hoursType, LocalDate startDate) {
         if (hoursType == WORK) {
             hoursRepository.deleteByFirefighterIdAndHoursTypeAndStartDate(firefighterId, hoursType, startDate);
@@ -180,9 +189,6 @@ public class HoursService {
             sb.append(line);
         }
         return sb;
-    }
-    public static List<LocalDate> getDatesBetween(LocalDate startDate, LocalDate endDate) {
-        return startDate.datesUntil(endDate).collect(Collectors.toList());
     }
 }
 

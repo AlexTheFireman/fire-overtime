@@ -37,14 +37,12 @@ public class HoursController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void save(@RequestBody HoursSaveCommand hoursSaveCommand) {
-        //можно добавить валидацию чуть позже
         hoursService.saveHours(hoursSaveCommand);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Hours update(@RequestBody HoursUpdateCommand hoursUpdateCommand) {
-        //можно добавить валидацию чуть позже
         return hoursService.updateHours(hoursUpdateCommand);
     }
 
