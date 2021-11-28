@@ -24,9 +24,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
             throws AuthenticationException {
         Base64.Encoder encoder = Base64.getEncoder();
         String encodeLogin = encoder.encodeToString(authentication.getName().getBytes());
-        // You can get the password here
         String encodePassword = encoder.encodeToString(authentication.getCredentials().toString().getBytes());
-        // Your custom authentication logic here
         Firefighter byLoginAndPassword = firefighterRepository.findByLoginAndPassword(encodeLogin, encodePassword);
         if (byLoginAndPassword == null) {
             throw new AccessDeniedException("user not identified");
