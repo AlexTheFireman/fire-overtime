@@ -17,7 +17,7 @@ public class OvertimeApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
-						.allowedOrigins("http://localhost:3000");
+						.allowedOrigins("https://overtime-front.herokuapp.com");
 			}
 		};
 	}
