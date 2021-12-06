@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class FirefighterDto {
 
+    private int id;
     private String firstName;
     private String lastName;
     private String patronymic;

@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
+
 @EnableJpaRepositories
 public class OvertimeApplication {
 
@@ -18,6 +19,7 @@ public class OvertimeApplication {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**")
 						.allowedOrigins("https://overtime-front.herokuapp.com");
+//                        .allowedOrigins("http://localhost:3000");
 			}
 		};
 	}
